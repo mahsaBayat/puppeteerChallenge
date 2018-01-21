@@ -24,16 +24,17 @@ const HOMEPAGE = "https://www.propelleraero.com";
 
 	// wait for 4 seconds (because this fixed a bug!!!!)
 	setTimeout(() => { findLongestBlog()},4000);
-	console.log("Please be patient...");
+	console.log("Please be patient :) ...");
 
 	// pass a string to count its words
-	async function countWords(string){
-		string = string.replace(/(^\s*)|(\s*$)/gi,"");
-		string = string.replace(/[ ]{2,}/gi," ");
-		string = string.replace(/\n /,"\n");
-		string = string.split(' ').length;
-		// return Promise.resolve(string); // returns an object
-		return string;
+	async function countWords(someString){
+
+		someString = someString.replace(/(^\s*)|(\s*$)/gi,"");
+		someString = someString.replace(/[ ]{2,}/gi," ");
+		someString = someString.replace(/\n /,"\n");
+		someString = someString.split(' ').length;
+		return someString;
+
 	}
 
 	// retreive all links to all the blog posts
@@ -53,9 +54,13 @@ const HOMEPAGE = "https://www.propelleraero.com";
 				linkToAllPosts.push(linkToPost);
 			}
 			return Promise.resolve(linkToAllPosts);
+
 		});
 
 		var max = 0;
+		var finalTitle;
+
+		console.log("There are ", allPosts.length , " posts to be visited.");
 
 		// for each post call the countWords function
 		for (var post of allPosts){
@@ -63,73 +68,28 @@ const HOMEPAGE = "https://www.propelleraero.com";
 			await page.goto(post);
 			// DOM manipulation to get extract the text from an article
 			var textContent = await page.evaluate( async () => {
-			// fetch the text content
-				var text = document.getElementsByTagName("article")[0].innerText;
-				return Promise.resolve(text);
+			// extract the text content
+			var text = document.getElementsByTagName("article")[0].innerText;
+			// extract the title
+			var title = document.getElementsByTagName("h1")[0].innerText;
+			return {text, title};
+
+		});
+
+			var currentTitle = Object.values(textContent)[1];
+			// count the words and calculate the max word counts
+			var currentCount = countWords(Object.values(textContent)[0]).then((wCount)=>{
+				// update the max value every time.
+				if(wCount.valueOf() > max){
+					// update max and finalTitle
+					max = wCount;
+					finalTitle = currentTitle;
+				};
 			});
-
-			// count the words
-			currentCount = countWords(textContent);
-			console.log(typeof currentCount, currentCount);
-
-			// calculate the max
-			if (currentCount.valueOf > max) {
-				max = currentCount;
-				console.log("Max is ", max);
-			}
 		}
+		console.log('Article ', '"' ,finalTitle, '"' ,'has the highest word count with ', max, ' words');
 
 	}
     // close the browser
+	// browser.close();
 })();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// to get the text of an article
-// var text = document.getElementsByTagName("article")[0].innerText
-// countWords('hi my name is mahsa').then(number => console.log(number));
-// await page.waitForNavigation({waitUntil: 'load'}).then(() =>console.log('Test'));
-// linkToAllPosts.push(linkToPost);
-// findLongestBlog().then(mahsa => console.log(mahsa));
-
-// go to the link
-// await page.goto(linkToPost);
-// wait untill dom is loaded
-// await page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 0 });
-// // get the text of the article
-//  var string = document.getElementsByTagName("article")[0].innerText;
-// string = string.replace(/(^\s*)|(\s*$)/gi,"");
-// string = string.replace(/[ ]{2,}/gi," ");
-// string = string.replace(/\n /,"\n");
-// length = string.split(' ').length;
-// console.log(length);
