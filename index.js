@@ -87,9 +87,9 @@ const HOMEPAGE = "https://www.propelleraero.com";
 				};
 			});
 		}
-		console.log('Article ', '"' ,finalTitle, '"' ,'has the highest word count with ', max, ' words');
+		console.log('Article ', '"' ,finalTitle, '"' ,'has the highest word count with ', max, ' words.');
 
 	}
     // close the browser
-	// browser.close();
+	browser.close();
 })();
